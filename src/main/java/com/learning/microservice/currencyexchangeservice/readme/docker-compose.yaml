@@ -1,0 +1,14 @@
+version: '2.23.3-desktop.2'
+
+services:
+  currency-exchange:
+    image: sumit0411/dock-currency-exchange:latest
+    mem_limit: 700m
+    ports:
+      - "8000:8000"
+    networks:
+      - currency-network
+
+
+networks:
+  currency-network:

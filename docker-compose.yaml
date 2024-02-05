@@ -1,0 +1,62 @@
+version: '2.23.3-desktop.2'
+
+services:
+  currency-exchange:
+    image: sumit0411/dock-currency-exchange:latest
+    mem_limit: 700m
+    ports:
+      - "8000:8000"
+    networks:
+      - currency-network
+    depends_on:
+      - naming-server
+    environment:
+      - eureka.client.serviceUrl.defaultZone=http://naming-server:8761/eureka/
+      - MANAGEMENT.ZIPKIN.TRACING.ENDPOINT=http://zipkin-server:9411/api/v2/spans
+
+  currency-conversion:
+    image: sumit0411/dock-currency-conversion:latest
+    mem_limit: 700m
+    ports:
+      - "8100:8100"
+    networks:
+      - currency-network
+    depends_on:
+      - naming-server
+    environment:
+      - eureka.client.serviceUrl.defaultZone=http://naming-server:8761/eureka/
+      - MANAGEMENT.ZIPKIN.TRACING.ENDPOINT=http://zipkin-server:9411/api/v2/spans
+
+  api-gateway:
+    image: sumit0411/dock-api-gateway:latest
+    mem_limit: 700m
+    ports:
+      - "8765:8765"
+    networks:
+      - currency-network
+    depends_on:
+      - naming-server
+    environment:
+      - eureka.client.serviceUrl.defaultZone=http://naming-server:8761/eureka/
+      - MANAGEMENT.ZIPKIN.TRACING.ENDPOINT=http://zipkin-server:9411/api/v2/spans
+
+  zipkin-server:
+    image: openzipkin/zipkin:latest
+    mem_limit: 300m
+    ports:
+      - "9411:9411"
+    networks:
+      - currency-network
+    restart: always
+
+  naming-server:
+    image: sumit0411/dock-naming-service:latest
+    mem_limit: 700m
+    ports:
+      - "8761:8761"
+    networks:
+      - currency-network
+
+
+networks:
+  currency-network:
